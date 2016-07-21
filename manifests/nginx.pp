@@ -75,7 +75,7 @@ define nginxphp::nginx_addphpconfig (
     path    => "/etc/nginx/sites-available/${name}.conf",
     owner   => 'root',
     group   => 'root',
-    mode    => 644,
+    mode    => '0644',
     require => Package['nginx'],
     content => template("nginxphp/nginx.php.conf.erb")
   }

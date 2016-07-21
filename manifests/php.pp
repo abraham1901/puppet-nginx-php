@@ -15,40 +15,40 @@
 # Sample Usage:
 #     include nginxphp::nginxphp
 #
-class nginxphp::php (
+class nginxphp7::php (
   $php_packages,
 ){
   # install FPM
   package {
-    'php5-fpm' :
+    'php7.0-fpm' :
       ensure => latest,
   }
 
   service {
-    'php5-fpm':
+    'php7.0-fpm':
       ensure => running,
+      provider => systemd,
       enable => true,
       hasrestart => true,
       hasstatus   => true,
-      require => Package['php5-fpm'],
-      restart => "/etc/init.d/php5-fpm restart"
+      require => Package['php7.0-fpm'],
+      restart => "/etc/init.d/php7.0-fpm restart"
   }
 
   # remove fpm default pool
   file {
     'fpm-disable-default' :
-      path => '/etc/php5/fpm/pool.d/www.conf',
+      path => '/etc/php7.0/fpm/pool.d/www.conf',
       ensure => absent,
-      notify => Service['php5-fpm'],
-      require => Package['php5-fpm']
+      notify => Service['php7.0-fpm'],
+      require => Package['php7.0-fpm']
   }
 
   # install base PHP
   $basePHP = [
-    'php5-cli',
-    'php-pear',
-    "php5-common",
-    "php5-dev"
+    'php7.0-cli',
+    "php7.0-common",
+    "php7.0-dev"
   ]
   package {
     $basePHP:
@@ -59,7 +59,7 @@ class nginxphp::php (
   package {
     $php_packages:
       ensure => latest,
-      notify => Service["php5-fpm"],
+      notify => Service["php7.0-fpm"],
   }
 }
 
@@ -88,7 +88,7 @@ class nginxphp::php (
 #       fpm_allowed_clients => ''
 #     }
 #
-define nginxphp::fpmconfig (
+define nginxphp7::fpmconfig (
   $php_devmode              = false,
   $fpm_user                 = 'www-data',
   $fpm_group                = 'www-data',
@@ -105,28 +105,31 @@ define nginxphp::fpmconfig (
   $fpm_log_level            = undef,
   $fpm_rlimit_files         = undef,
   $fpm_rlimit_core          = undef,
-  $pool_cfg_append          = undef
+  $pool_cfg_append          = undef,
+  $include                  = '/etc/php/7.0/fpm/pool.d/*.conf',
+  $pid                      = '/run/php/php7.0-fpm.pid',
+  $error_log                = '/var/log/php7.0-fpm.log',
 ){
   # set config file for the pool
   file {"fpm-pool-${name}":
-    path            => "/etc/php5/fpm/pool.d/${name}.conf",
+    path            => "/etc/php/7.0/fpm/pool.d/${name}.conf",
     owner           => 'root',
     group           => 'root',
-    mode            => 644,
-    notify          => Service['php5-fpm'],
-    require         => Package['php5-fpm'],
+    mode            => '0644',
+    notify          => Service['php7.0-fpm'],
+    require         => Package['php7.0-fpm'],
     content         => template('nginxphp/pool.conf.erb'),
   }
 
   # set config file for the pool
-  if ! defined(File["/etc/php5/fpm/php-fpm.conf"]) {
-    file {'/etc/php5/fpm/php-fpm.conf':
+  if ! defined(File["/etc/php/7.0/fpm/php-fpm.conf"]) {
+    file {'/etc/php/7.0/fpm/php-fpm.conf':
       owner   => 'root',
       group   => 'root',
       mode    => '0644',
-      notify  => Service['php5-fpm'],
-      require => Package['php5-fpm'],
+      notify  => Service['php7.0-fpm'],
+      require => Package['php7.0-fpm'],
       content => template('nginxphp/php-fpm.conf.erb')
     }
-}
+  }
 }
