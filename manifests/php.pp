@@ -106,6 +106,7 @@ define nginxphp7::fpmconfig (
   $fpm_rlimit_files         = undef,
   $fpm_rlimit_core          = undef,
   $pool_cfg_append          = undef,
+  $chroot                   = false,
   $include                  = '/etc/php/7.0/fpm/pool.d/*.conf',
   $pid                      = '/run/php/php7.0-fpm.pid',
   $error_log                = '/var/log/php7.0-fpm.log',
@@ -118,7 +119,7 @@ define nginxphp7::fpmconfig (
     mode            => '0644',
     notify          => Service['php7.0-fpm'],
     require         => Package['php7.0-fpm'],
-    content         => template('nginxphp/pool.conf.erb'),
+    content         => template('nginxphp7/pool.conf.erb'),
   }
 
   # set config file for the pool
@@ -129,7 +130,7 @@ define nginxphp7::fpmconfig (
       mode    => '0644',
       notify  => Service['php7.0-fpm'],
       require => Package['php7.0-fpm'],
-      content => template('nginxphp/php-fpm.conf.erb')
+      content => template('nginxphp7/php-fpm.conf.erb')
     }
   }
 }

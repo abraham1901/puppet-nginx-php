@@ -114,5 +114,5 @@ log_level = <%= @fpm_log_level %>
 
 ; To configure the pools it is recommended to have one .conf file per
 ; pool in the following directory:
-include=/etc/php5/fpm/pool.d/*.conf
+include=<%= @include %>
 

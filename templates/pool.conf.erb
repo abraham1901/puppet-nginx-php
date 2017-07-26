@@ -344,8 +344,9 @@ rlimit_core = <%= @fpm_rlimit_core %>
 ;       possible. However, all PHP paths will be relative to the chroot
 ;       (error_log, sessions.save_path, ...).
 ; Default Value: not set
-;chroot = 
- 
+<% if @chroot -%>
+chroot = <%= @chroot %>
+<% end -%>
 ; Chdir to this directory at the start.
 ; Note: relative path can be used.
 ; Default Value: current directory or / when chroot
